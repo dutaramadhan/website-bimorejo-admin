@@ -10,6 +10,10 @@ const articleSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    writer: {
+      type: String,
+      required: true,
+    },
     image: {
       data: String,
       contentType: String,
