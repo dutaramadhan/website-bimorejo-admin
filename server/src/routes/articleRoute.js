@@ -9,6 +9,9 @@ const upload = multer({ storage: storage });
 // Create a new article
 router.post('/', upload.single('image'), articlesController.createArticle);
 
+//Edit an existing article
+router.put('/:id', upload.single('image'), articlesController.editArticleById);
+
 // Retrieve all articles
 // router.get('/', articlesController.getAllArticles);
 

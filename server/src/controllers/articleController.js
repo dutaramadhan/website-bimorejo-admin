@@ -11,7 +11,7 @@ exports.createArticle = async (req, res) => {
       });
     }
 
-    if (req.file.size > 2 * 1024 * 1024) {
+    if (req.file.size > 1 * 1024 * 1024) {
       return res.status(400).json({ error: 'File size is too large. Maximum limit is 2MB.' });
     }
 
@@ -90,6 +90,7 @@ exports.getArticlesWithPagination = async (req, res) => {
 
   try {
     const articles = await articleModel.find()
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();
@@ -108,6 +109,45 @@ exports.getArticlesWithPagination = async (req, res) => {
   }
 };
 
+exports.editArticleById = async (req, res) => {
+  try{
+  const id = req.params.id;
+  const { title, content, writer } = req.body;
+
+  if (!title || !content || !writer || !req.file) {
+    return res.status(400).send({
+      message: "All fields are required (title, content, writer, image)"
+    });
+  }
+
+  if (req.file.size > 1 * 1024 * 1024) {
+    return res.status(400).json({ error: 'File size is too large. Maximum limit is 2MB.' });
+  }
+
+  const base64Image = req.file.buffer.toString('base64');
+
+  const updatedData = {
+    title,
+    content,
+    writer,
+    image: {
+      data: base64Image,
+      contentType: req.file.mimetype
+    }
+  }
+
+  const updatedArticle = await articleModel.findByIdAndUpdate(id, updatedData, { new: true, runValidators: true }).select('_id title content writer');
+
+  if(!updatedArticle){
+    return res.status(404).json({ error: 'Article not found' });
+  }
+
+  return res.status(200).json({ message: 'Article updated successfully', article: updatedArticle });
+}catch (err) {
+  console.error('Error updating article:', err);
+  return res.status(500).json({ error: 'Internal Server Error' });
+}
+};
 
 exports.deleteArticleById = async (req, res) => {
   try {
