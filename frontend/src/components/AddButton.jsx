@@ -5,7 +5,7 @@ import { styled } from '@mui/system';
 
 const StyledFab = styled(Fab)({
   position: 'fixed',
-  bottom: '30px',
+  bottom: '80px',
   right: '35px',
   backgroundColor: '#1976d2',
   '&:hover': {
